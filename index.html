@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>尤達數理 | Yoda's Optical Lab</title>
+    <title>尤達光學實驗室 | Yoda's Optical Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -32,7 +32,7 @@
             appearance: none;
         }
 
-        /* 單字卡翻轉與切換動畫 */
+        /* 動畫 */
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
         }
@@ -47,6 +47,18 @@
             border-color: #3b82f6;
             box-shadow: 0 0 10px #3b82f6;
         }
+        
+        /* 錯誤時的閃爍 */
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -54,7 +66,7 @@
     <!-- 頂部導覽 -->
     <header class="w-full max-w-4xl flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
         <h1 class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
-            🧪 尤達數理
+            🧪 尤達光學實驗室
         </h1>
         <nav class="flex gap-2">
             <button onclick="switchPage('sim')" id="nav-sim" class="px-4 py-2 rounded-lg text-sm font-bold bg-slate-700 hover:bg-slate-600 transition text-green-400">
@@ -66,7 +78,7 @@
         </nav>
     </header>
 
-    <!-- 頁面 1: 動態模擬器 -->
+    <!-- ================= 頁面 1: 動態模擬器 ================= -->
     <main id="page-sim" class="w-full max-w-4xl flex flex-col gap-4 fade-in">
         
         <!-- 控制面板 -->
@@ -112,19 +124,22 @@
         </div>
     </main>
 
-    <!-- 頁面 2: 單字卡練習 -->
+    <!-- ================= 頁面 2: 單字卡練習 ================= -->
     <main id="page-practice" class="hidden w-full max-w-2xl flex flex-col gap-6 fade-in">
         
-        <!-- 進度條 -->
-        <div class="w-full bg-slate-800 rounded-full h-2.5">
-            <div id="progressBar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+        <!-- 進度條與分數 -->
+        <div class="flex items-center gap-4">
+            <div class="flex-grow bg-slate-800 rounded-full h-2.5">
+                <div id="progressBar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="text-sm text-slate-400 font-mono">Score: <span id="scoreDisplay" class="text-green-400 font-bold">0</span></div>
         </div>
 
         <!-- 題目卡片 -->
-        <div id="quizCard" class="bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-2xl relative min-h-[400px] flex flex-col">
+        <div id="quizCard" class="bg-slate-800 border border-slate-700 rounded-2xl p-6 md:p-8 shadow-2xl relative min-h-[450px] flex flex-col">
             
             <!-- 題目顯示區 -->
-            <div class="text-center mb-8">
+            <div class="text-center mb-6">
                 <div class="inline-block px-3 py-1 bg-slate-700 rounded-full text-xs text-slate-300 mb-3">
                     第 <span id="qCurrent">1</span> / <span id="qTotal">10</span> 題
                 </div>
@@ -132,59 +147,63 @@
                 <p class="text-lg text-slate-300">物體位置：<span id="qPos" class="text-white font-bold border-b-2 border-green-500 pb-1">兩倍焦距外</span></p>
             </div>
 
-            <!-- 選擇區 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow content-center" id="choicesArea">
+            <!-- 選擇區 (修正版布局) -->
+            <div class="grid grid-cols-1 gap-5 flex-grow content-start" id="choicesArea">
                 
                 <!-- 1. 正立/倒立 -->
-                <div class="flex flex-col gap-2">
-                    <span class="text-xs text-slate-400 uppercase tracking-wider text-center">方向</span>
+                <div class="flex flex-col gap-1">
+                    <span class="text-xs text-slate-500 uppercase tracking-wider text-center font-bold">方向</span>
                     <div class="flex rounded-lg bg-slate-900 p-1 border border-slate-700">
-                        <button onclick="selectOption('inv', '正立')" class="btn-toggle w-1/2 py-2 rounded text-sm text-slate-400 hover:text-white transition" data-group="inv" data-val="正立">正立</button>
-                        <button onclick="selectOption('inv', '倒立')" class="btn-toggle w-1/2 py-2 rounded text-sm text-slate-400 hover:text-white transition" data-group="inv" data-val="倒立">倒立</button>
+                        <button onclick="selectOption('inv', '正立')" class="btn-toggle w-1/2 py-3 rounded text-sm text-slate-400 hover:text-white transition font-medium" data-group="inv" data-val="正立">正立</button>
+                        <button onclick="selectOption('inv', '倒立')" class="btn-toggle w-1/2 py-3 rounded text-sm text-slate-400 hover:text-white transition font-medium" data-group="inv" data-val="倒立">倒立</button>
                     </div>
                 </div>
 
-                <!-- 2. 放大/縮小 -->
-                <div class="flex flex-col gap-2">
-                    <span class="text-xs text-slate-400 uppercase tracking-wider text-center">大小</span>
+                <!-- 2. 放大/相等/縮小 (修正：永遠顯示三個選項) -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-xs text-slate-500 uppercase tracking-wider text-center font-bold">大小</span>
                     <div class="flex rounded-lg bg-slate-900 p-1 border border-slate-700">
-                        <button onclick="selectOption('size', '放大')" class="btn-toggle w-1/2 py-2 rounded text-sm text-slate-400 hover:text-white transition" data-group="size" data-val="放大">放大</button>
-                        <button onclick="selectOption('size', '縮小')" class="btn-toggle w-1/2 py-2 rounded text-sm text-slate-400 hover:text-white transition" data-group="size" data-val="縮小">縮小</button>
-                        <!-- 特殊情況：相等 -->
-                        <button onclick="selectOption('size', '相等')" class="btn-toggle w-1/3 hidden py-2 rounded text-sm text-slate-400" data-group="size" data-val="相等">相等</button>
+                        <button onclick="selectOption('size', '放大')" class="btn-toggle w-1/3 py-3 rounded text-sm text-slate-400 hover:text-white transition font-medium" data-group="size" data-val="放大">放大</button>
+                        <button onclick="selectOption('size', '相等')" class="btn-toggle w-1/3 py-3 rounded text-sm text-slate-400 hover:text-white transition font-medium" data-group="size" data-val="相等">相等</button>
+                        <button onclick="selectOption('size', '縮小')" class="btn-toggle w-1/3 py-3 rounded text-sm text-slate-400 hover:text-white transition font-medium" data-group="size" data-val="縮小">縮小</button>
                     </div>
                 </div>
 
-                <!-- 3. 虛/實 -->
-                <div class="flex flex-col gap-2">
-                    <span class="text-xs text-slate-400 uppercase tracking-wider text-center">性質</span>
-                    <div class="flex rounded-lg bg-slate-900 p-1 border border-slate-700">
-                        <button onclick="selectOption('real', '實像')" class="btn-toggle w-1/2 py-2 rounded text-sm text-slate-400 hover:text-white transition" data-group="real" data-val="實像">實像</button>
-                        <button onclick="selectOption('real', '虛像')" class="btn-toggle w-1/2 py-2 rounded text-sm text-slate-400 hover:text-white transition" data-group="real" data-val="虛像">虛像</button>
+                <!-- 3. 虛/實 與 同側/異側 (合併在同一行以節省空間，或分開) -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xs text-slate-500 uppercase tracking-wider text-center font-bold">性質</span>
+                        <div class="flex rounded-lg bg-slate-900 p-1 border border-slate-700">
+                            <button onclick="selectOption('real', '實像')" class="btn-toggle w-1/2 py-3 rounded text-sm text-slate-400 hover:text-white transition font-medium" data-group="real" data-val="實像">實像</button>
+                            <button onclick="selectOption('real', '虛像')" class="btn-toggle w-1/2 py-3 rounded text-sm text-slate-400 hover:text-white transition font-medium" data-group="real" data-val="虛像">虛像</button>
+                        </div>
                     </div>
-                </div>
-
-                <!-- 4. 同側/異側 -->
-                <div class="flex flex-col gap-2">
-                    <span class="text-xs text-slate-400 uppercase tracking-wider text-center">位置</span>
-                    <div class="flex rounded-lg bg-slate-900 p-1 border border-slate-700">
-                        <button onclick="selectOption('side', '同側')" class="btn-toggle w-1/2 py-2 rounded text-sm text-slate-400 hover:text-white transition" data-group="side" data-val="同側">同側</button>
-                        <button onclick="selectOption('side', '異側')" class="btn-toggle w-1/2 py-2 rounded text-sm text-slate-400 hover:text-white transition" data-group="side" data-val="異側">異側</button>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xs text-slate-500 uppercase tracking-wider text-center font-bold">位置</span>
+                        <div class="flex rounded-lg bg-slate-900 p-1 border border-slate-700">
+                            <button onclick="selectOption('side', '同側')" class="btn-toggle w-1/2 py-3 rounded text-sm text-slate-400 hover:text-white transition font-medium" data-group="side" data-val="同側">同側</button>
+                            <button onclick="selectOption('side', '異側')" class="btn-toggle w-1/2 py-3 rounded text-sm text-slate-400 hover:text-white transition font-medium" data-group="side" data-val="異側">異側</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 結果回饋區 (初始隱藏) -->
-            <div id="feedbackArea" class="hidden absolute inset-0 bg-slate-800/95 rounded-2xl z-10 flex flex-col items-center justify-center text-center p-6 backdrop-blur-sm">
-                <div id="feedbackIcon" class="text-6xl mb-4">🎉</div>
+            <!-- 結果回饋區 (覆蓋層) -->
+            <div id="feedbackArea" class="hidden absolute inset-0 bg-slate-900/95 rounded-2xl z-20 flex flex-col items-center justify-center text-center p-6 backdrop-blur-sm">
+                <div id="feedbackIcon" class="text-6xl mb-4 animate-bounce">🎉</div>
                 <h3 id="feedbackTitle" class="text-2xl font-bold text-white mb-2">答對了！</h3>
-                <p id="feedbackText" class="text-slate-300 mb-6">解析文字...</p>
-                <button onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-full font-bold shadow-lg transition">下一題</button>
+                <div class="text-left bg-slate-800 p-4 rounded-lg border border-slate-700 mb-6 w-full max-w-xs">
+                    <p class="text-xs text-slate-400 mb-1">正確解答：</p>
+                    <p id="feedbackText" class="text-slate-200 text-sm font-mono leading-relaxed">
+                        <!-- 動態填入 -->
+                    </p>
+                </div>
+                <button onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-full font-bold shadow-lg transition w-full md:w-auto">下一題 &rarr;</button>
             </div>
 
             <!-- 送出按鈕 -->
-            <div class="mt-8 text-center">
-                <button onclick="checkAnswer()" class="w-full md:w-auto bg-green-600 hover:bg-green-500 text-white px-10 py-3 rounded-lg font-bold shadow-lg shadow-green-900/50 transition transform active:scale-95">
+            <div class="mt-6 text-center">
+                <button onclick="checkAnswer()" class="w-full bg-green-600 hover:bg-green-500 text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-green-900/50 transition transform active:scale-95 text-lg tracking-wide">
                     確認答案
                 </button>
             </div>
@@ -194,7 +213,7 @@
 
     <script>
         // ==========================================
-        // 全局變數與工具
+        // 1. 核心：頁面切換邏輯
         // ==========================================
         let currentPage = 'sim';
 
@@ -208,62 +227,63 @@
             if (page === 'sim') {
                 document.getElementById('page-sim').classList.remove('hidden');
                 document.getElementById('nav-sim').classList.add('text-green-400');
-                resizeCanvas(); // 確保 Canvas 大小正確
+                setTimeout(resizeCanvas, 50); // 確保切換後 Canvas 大小正確
             } else {
                 document.getElementById('page-practice').classList.remove('hidden');
                 document.getElementById('nav-practice').classList.add('text-green-400');
-                initPractice(); // 初始化練習
+                if(shuffledQuestions.length === 0) initPractice(); // 初次進入才初始化
             }
         }
 
         // ==========================================
-        // 模擬器邏輯 (Simulator)
+        // 2. 模擬器邏輯 (Physics Engine)
         // ==========================================
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
         let width, height, centerX, centerY;
 
-        // 物理參數
         let focalLength = 100; 
-        let objectX_rel = -150; // 相對中心的X座標 (負為左)
+        let objectX_rel = -150; 
         let objectH = 60;
         let type = "convex_lens";
         let isDragging = false;
 
         function resizeCanvas() {
-            const container = canvas.parentElement;
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-            width = canvas.width;
-            height = canvas.height;
-            centerX = width / 2;
-            centerY = height / 2;
-            draw();
+            if(canvas.parentElement) {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+                width = canvas.width;
+                height = canvas.height;
+                centerX = width / 2;
+                centerY = height / 2;
+                draw();
+            }
         }
         window.addEventListener('resize', resizeCanvas);
 
         function updateSettings() {
             type = document.getElementById('opticsType').value;
+            // 焦距設定 (符合物理符號慣例)
             if (type === 'convex_lens' || type === 'concave_mirror') {
-                focalLength = 100; 
+                focalLength = 100; // 匯聚型
             } else if (type === 'concave_lens' || type === 'convex_mirror') {
-                focalLength = -100;
+                focalLength = -100; // 發散型
             } else {
-                focalLength = Infinity;
+                focalLength = Infinity; // 平面鏡
             }
             draw();
         }
 
         function calculateImage() {
-            let p = Math.abs(objectX_rel); // 物距總是正值
+            let p = Math.abs(objectX_rel); // 物距
             if (p === 0) p = 0.1;
             let q, m;
 
             if (type === 'plane_mirror') {
-                q = -p;
+                q = -p; // 平面鏡: 像距 = -物距
                 m = 1;
             } else {
-                // 1/p + 1/q = 1/f  => q = (p*f)/(p-f)
+                // 造鏡者公式: 1/p + 1/q = 1/f
                 q = (p * focalLength) / (p - focalLength);
                 m = -q / p;
             }
@@ -273,22 +293,21 @@
         function draw() {
             ctx.clearRect(0, 0, width, height);
             
-            // 光軸
-            ctx.strokeStyle = '#334155'; // Slate 700
+            // 畫光軸
+            ctx.strokeStyle = '#334155'; 
             ctx.beginPath();
             ctx.moveTo(0, centerY);
             ctx.lineTo(width, centerY);
             ctx.stroke();
 
-            // 繪製鏡子/透鏡
-            ctx.strokeStyle = '#22d3ee'; // Cyan 400
+            // 畫元件 (鏡子/透鏡)
+            ctx.strokeStyle = '#22d3ee';
             ctx.lineWidth = 4;
             ctx.shadowBlur = 10;
             ctx.shadowColor = '#22d3ee';
             ctx.beginPath();
             
             if (type.includes('mirror') && type !== 'plane_mirror') {
-                // 畫彎曲的鏡子
                 let curve = (type === 'concave_mirror') ? -20 : 20;
                 ctx.moveTo(centerX, centerY - 100);
                 ctx.quadraticCurveTo(centerX + curve, centerY, centerX, centerY + 100);
@@ -296,28 +315,26 @@
                 ctx.moveTo(centerX, centerY - 100);
                 ctx.lineTo(centerX, centerY + 100);
             } else {
-                 // 畫透鏡形狀 (簡化為橢圓或直線加箭頭，這裡用直線示意透鏡主軸)
                 ctx.moveTo(centerX, centerY - 100);
                 ctx.lineTo(centerX, centerY + 100);
-                // 加上透鏡符號
-                if (type === 'convex_lens') { // 箭頭向外
-                    ctx.lineTo(centerX - 10, centerY + 90); ctx.moveTo(centerX, centerY + 100); ctx.lineTo(centerX + 10, centerY + 90);
-                    ctx.moveTo(centerX, centerY - 100); ctx.lineTo(centerX - 10, centerY - 90); ctx.moveTo(centerX, centerY - 100); ctx.lineTo(centerX + 10, centerY - 90);
-                } else { // 箭頭向內
-                    ctx.moveTo(centerX - 10, centerY + 100); ctx.lineTo(centerX, centerY + 90); ctx.lineTo(centerX + 10, centerY + 100);
+                // 簡單透鏡符號
+                if (type === 'convex_lens') {
+                    ctx.moveTo(centerX - 10, centerY - 90); ctx.lineTo(centerX, centerY - 100); ctx.lineTo(centerX + 10, centerY - 90);
+                    ctx.moveTo(centerX - 10, centerY + 90); ctx.lineTo(centerX, centerY + 100); ctx.lineTo(centerX + 10, centerY + 90);
+                } else {
                     ctx.moveTo(centerX - 10, centerY - 100); ctx.lineTo(centerX, centerY - 90); ctx.lineTo(centerX + 10, centerY - 100);
+                    ctx.moveTo(centerX - 10, centerY + 100); ctx.lineTo(centerX, centerY + 90); ctx.lineTo(centerX + 10, centerY + 100);
                 }
             }
             ctx.stroke();
-            ctx.shadowBlur = 0; // Reset glow
+            ctx.shadowBlur = 0; 
 
-            // 焦點標記
+            // 畫焦點 F (平面鏡除外)
             if (type !== 'plane_mirror') {
-                ctx.fillStyle = '#fbbf24'; // Amber 400
+                ctx.fillStyle = '#fbbf24'; 
                 ctx.font = '12px sans-serif';
                 let fAbs = Math.abs(focalLength);
                 
-                // 畫 F 和 2F 點
                 [fAbs, 2*fAbs].forEach(dist => {
                     [1, -1].forEach(sign => {
                         let x = centerX + dist * sign;
@@ -326,58 +343,47 @@
                         ctx.fill();
                     });
                 });
-
                 ctx.fillText("F", centerX - fAbs - 5, centerY + 20);
                 ctx.fillText("2F", centerX - 2 * fAbs - 10, centerY + 20);
-                ctx.fillText("F'", centerX + fAbs - 5, centerY + 20);
             }
 
-            // 計算成像
+            // 計算與繪圖
             let { q, m } = calculateImage();
             
-            // 決定像的 X 座標 (視覺邏輯核心)
-            // 1. 物體總是在左邊 (objectX_rel 總是負的)
             let objVisualX = centerX + objectX_rel;
-            
             let imgVisualX;
-            // 透鏡：實像(q>0)在對面(右)，虛像(q<0)在同側(左)
-            // 面鏡：實像(q>0)在同側(左)，虛像(q<0)在對面(右)
             
+            // === 視覺邏輯核心 ===
+            // 透鏡：實像(q>0)在右(異側)，虛像(q<0)在左(同側)
+            // 面鏡：實像(q>0)在左(同側)，虛像(q<0)在右(異側/鏡後)
             if (type.includes('lens')) {
                 imgVisualX = centerX + q; 
             } else {
-                // 面鏡 q>0 代表實像(鏡前/左)，q<0 代表虛像(鏡後/右)
-                // 坐標系：右為正。
-                // 如果 q=100 (實), 應該在 centerX - 100
-                // 如果 q=-100 (虛), 應該在 centerX - (-100) = centerX + 100
                 imgVisualX = centerX - q;
             }
 
-            // 繪製物體 (紅色光劍)
+            // 畫物
             drawLightSaber(objVisualX, centerY, objectH, '#ef4444', '物');
 
-            // 繪製像 (藍色光劍)
+            // 畫像
             let imgH = objectH * m;
             let isVirtual = (q < 0);
             let statusText = "";
             
-            // 狀態判斷
             if (Math.abs(q) > 5000 || isNaN(q)) {
                 statusText = "不成像 (光線平行)";
                 document.getElementById('imageStatus').className = "text-lg font-bold text-slate-400";
             } else {
-                // 更新 UI 文字
                 let sizeText = Math.abs(m).toFixed(2) == 1.00 ? "相等" : (Math.abs(m) > 1 ? "放大" : "縮小");
                 let natureText = isVirtual ? "正立虛像" : "倒立實像";
-                if(type === 'plane_mirror') natureText = "正立虛像 (左右相反)";
+                if(type === 'plane_mirror') natureText = "正立虛像";
                 
                 statusText = `${natureText} (${sizeText})`;
                 let colorClass = isVirtual ? "text-amber-400" : "text-green-400";
                 document.getElementById('imageStatus').className = `text-lg font-bold ${colorClass}`;
                 
-                // 畫像
                 ctx.save();
-                if (isVirtual) ctx.globalAlpha = 0.4; // 虛像半透明
+                if (isVirtual) ctx.globalAlpha = 0.4;
                 drawLightSaber(imgVisualX, centerY, imgH, '#3b82f6', '像');
                 ctx.restore();
             }
@@ -392,16 +398,13 @@
             ctx.lineCap = "round";
             ctx.shadowBlur = 15;
             ctx.shadowColor = color;
-            
             ctx.beginPath();
-            ctx.moveTo(x, y); // 底部
-            ctx.lineTo(x, y - h); // 頂部
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y - h);
             ctx.stroke();
             
-            // 箭頭 (簡化為光暈頂端)
             ctx.fillStyle = color;
             ctx.beginPath();
-            // 如果倒立 (h為負)，箭頭在下方
             let tipY = y - h;
             ctx.arc(x, tipY, 3, 0, Math.PI*2);
             ctx.fill();
@@ -412,90 +415,76 @@
             ctx.fillText(label, x - 6, y + 20);
         }
 
-        // 拖曳事件處理
+        // 拖曳事件
         function handleStart(x) {
-            // 檢查是否點擊到物體 (範圍寬容度 30px)
             let objVisualX = centerX + objectX_rel;
             if (Math.abs(x - objVisualX) < 40) {
                 isDragging = true;
                 document.getElementById('dragHint').style.display = 'none';
             }
         }
-
         function handleMove(x) {
             if (isDragging) {
-                // 限制只能在左側
                 let newRelX = x - centerX;
-                if (newRelX > -10) newRelX = -10;
+                if (newRelX > -10) newRelX = -10; // 限制在左側
                 objectX_rel = newRelX;
                 draw();
             }
         }
+        function handleEnd() { isDragging = false; }
 
-        function handleEnd() {
-            isDragging = false;
-        }
-
-        // Mouse Events
         canvas.addEventListener('mousedown', e => handleStart(e.offsetX));
         canvas.addEventListener('mousemove', e => handleMove(e.offsetX));
         window.addEventListener('mouseup', handleEnd);
-
-        // Touch Events
-        canvas.addEventListener('touchstart', e => {
-            e.preventDefault();
-            let rect = canvas.getBoundingClientRect();
-            let touchX = e.touches[0].clientX - rect.left;
-            handleStart(touchX);
-        }, {passive: false});
-
-        canvas.addEventListener('touchmove', e => {
-            e.preventDefault();
-            if (isDragging) {
-                let rect = canvas.getBoundingClientRect();
-                let touchX = e.touches[0].clientX - rect.left;
-                handleMove(touchX);
-            }
-        }, {passive: false});
-
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); handleStart(e.touches[0].clientX - canvas.getBoundingClientRect().left); }, {passive:false});
+        canvas.addEventListener('touchmove', e => { e.preventDefault(); if(isDragging) handleMove(e.touches[0].clientX - canvas.getBoundingClientRect().left); }, {passive:false});
         canvas.addEventListener('touchend', handleEnd);
 
-        // 初始化
-        setTimeout(() => {
-            resizeCanvas();
-            updateSettings();
-        }, 100);
+        setTimeout(() => { resizeCanvas(); updateSettings(); }, 100);
 
 
         // ==========================================
-        // 練習模式邏輯 (Practice Mode)
+        // 3. 練習模式邏輯 (Drill Mode) - 已修正邏輯
         // ==========================================
         
-        // 題庫資料
+        // 完整題庫 (Convex Lens, Concave Lens, Concave Mirror, Convex Mirror, Plane Mirror)
+        // 關鍵邏輯定義：
+        // 實像：透鏡在異側，面鏡在同側
+        // 虛像：透鏡在同側，面鏡在異側(鏡後)
         const questionBank = [
+            // 凸透鏡
             { type: "凸透鏡", pos: "兩倍焦距外 (2F外)",   ans: { inv: "倒立", size: "縮小", real: "實像", side: "異側" } },
             { type: "凸透鏡", pos: "剛好在 2F",          ans: { inv: "倒立", size: "相等", real: "實像", side: "異側" } },
             { type: "凸透鏡", pos: "F 與 2F 之間",       ans: { inv: "倒立", size: "放大", real: "實像", side: "異側" } },
             { type: "凸透鏡", pos: "焦點內 (<F)",        ans: { inv: "正立", size: "放大", real: "虛像", side: "同側" } },
             
+            // 凹透鏡 (只有一種結果)
             { type: "凹透鏡", pos: "任意位置",           ans: { inv: "正立", size: "縮小", real: "虛像", side: "同側" } },
             
+            // 凹面鏡 (補完所有情況)
             { type: "凹面鏡", pos: "兩倍焦距外 (2F外)",   ans: { inv: "倒立", size: "縮小", real: "實像", side: "同側" } },
-            { type: "凹面鏡", pos: "焦點內 (<F)",        ans: { inv: "正立", size: "放大", real: "虛像", side: "異側" } },
+            { type: "凹面鏡", pos: "剛好在 2F",          ans: { inv: "倒立", size: "相等", real: "實像", side: "同側" } }, // 新增
+            { type: "凹面鏡", pos: "F 與 2F 之間",       ans: { inv: "倒立", size: "放大", real: "實像", side: "同側" } }, // 新增
+            { type: "凹面鏡", pos: "焦點內 (<F)",        ans: { inv: "正立", size: "放大", real: "虛像", side: "異側" } }, // 注意：面鏡虛像在鏡後(異側)
             
-            { type: "凸面鏡", pos: "任意位置",           ans: { inv: "正立", size: "縮小", real: "虛像", side: "異側" } },
+            // 凸面鏡 (只有一種結果)
+            { type: "凸面鏡", pos: "任意位置",           ans: { inv: "正立", size: "縮小", real: "虛像", side: "異側" } }, // 注意：面鏡虛像在鏡後
             
-            { type: "平面鏡", pos: "任意位置",           ans: { inv: "正立", size: "相等", real: "虛像", side: "異側" } }
+            // 平面鏡
+            { type: "平面鏡", pos: "任意位置",           ans: { inv: "正立", size: "相等", real: "虛像", side: "異側" } }  // 鏡後
         ];
 
         let currentQIndex = 0;
+        let score = 0;
         let currentSelection = { inv: null, size: null, real: null, side: null };
         let shuffledQuestions = [];
 
         function initPractice() {
-            // 洗牌題目
+            // 隨機排序
             shuffledQuestions = [...questionBank].sort(() => Math.random() - 0.5);
             currentQIndex = 0;
+            score = 0;
+            document.getElementById('scoreDisplay').innerText = score;
             document.getElementById('qTotal').innerText = shuffledQuestions.length;
             loadQuestion();
         }
@@ -506,51 +495,20 @@
             document.getElementById('qType').innerText = q.type;
             document.getElementById('qPos').innerText = q.pos;
             
-            // 更新進度條
             let pct = (currentQIndex / shuffledQuestions.length) * 100;
             document.getElementById('progressBar').style.width = `${pct}%`;
 
-            // 重置按鈕狀態
+            // 重置所有按鈕
             currentSelection = { inv: null, size: null, real: null, side: null };
             document.querySelectorAll('.btn-toggle').forEach(btn => {
                 btn.classList.remove('active');
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
             });
             
-            // 特殊處理：如果有"相等"選項，根據題目隱藏或顯示
-            // 簡單起見，我們在 UI 裡藏了一個"相等"，只有需要時才顯示，或者統一只有大/小/等三個選項
-            // 這裡為了流暢，我們把"相等"選項動態處理
-            const equalBtn = document.querySelector('button[data-val="相等"]');
-            const sizeBtns = document.querySelectorAll('button[data-group="size"]:not([data-val="相等"])');
-            
-            if (q.ans.size === '相等') {
-                 equalBtn.classList.remove('hidden');
-                 sizeBtns.forEach(b => b.classList.add('hidden'));
-                 // 自動選相等 (或讓用戶選) - 這裡簡化讓用戶必須選對應按鈕
-                 // 為了讓介面統一，我們讓"縮小/放大"按鈕變成"相等"
-                 sizeBtns[0].innerText = "相等";
-                 sizeBtns[0].setAttribute('data-val', '相等');
-                 sizeBtns[0].classList.remove('hidden');
-                 sizeBtns[1].classList.add('hidden');
-            } else {
-                equalBtn.classList.add('hidden');
-                sizeBtns[0].innerText = "放大";
-                sizeBtns[0].setAttribute('data-val', '放大');
-                sizeBtns[0].classList.remove('hidden');
-                sizeBtns[1].innerText = "縮小";
-                sizeBtns[1].setAttribute('data-val', '縮小');
-                sizeBtns[1].classList.remove('hidden');
-            }
-
             document.getElementById('feedbackArea').classList.add('hidden');
         }
 
         function selectOption(group, val) {
-            // 更新資料
             currentSelection[group] = val;
-            
-            // 更新 UI (單選邏輯)
             document.querySelectorAll(`button[data-group="${group}"]`).forEach(btn => {
                 if (btn.dataset.val === val) {
                     btn.classList.add('active');
@@ -561,20 +519,20 @@
         }
 
         function checkAnswer() {
-            // 檢查是否全部選完
+            // 驗證是否填完
             if (Object.values(currentSelection).includes(null)) {
-                alert("請先完成所有選項的選擇！");
+                // 簡單的搖動動畫提示
+                document.getElementById('choicesArea').classList.add('shake');
+                setTimeout(() => document.getElementById('choicesArea').classList.remove('shake'), 500);
                 return;
             }
 
             let q = shuffledQuestions[currentQIndex];
             let isCorrect = true;
-            let wrongParts = [];
 
             for (let key in q.ans) {
                 if (currentSelection[key] !== q.ans[key]) {
                     isCorrect = false;
-                    wrongParts.push(key);
                 }
             }
 
@@ -590,30 +548,40 @@
             fbArea.classList.remove('hidden');
             
             if (isCorrect) {
+                score += 100;
+                document.getElementById('scoreDisplay').innerText = score;
                 fbIcon.innerText = "🎉";
                 fbTitle.innerText = "完全正確！";
                 fbTitle.className = "text-2xl font-bold text-green-400 mb-2";
-                fbText.innerText = "原力與你同在，你的觀念非常清晰。";
+                
+                // 簡單的鼓勵語
+                let compliments = ["原力與你同在。", "你的觀念無懈可擊！", "完美的判斷。", "光學大師是你？"];
+                fbText.innerHTML = compliments[Math.floor(Math.random() * compliments.length)];
+                
             } else {
                 fbIcon.innerText = "⚠️";
                 fbTitle.innerText = "差一點點...";
                 fbTitle.className = "text-2xl font-bold text-red-400 mb-2";
-                fbText.innerHTML = `正確答案是：<br>
-                <span class="font-bold text-white">${q.ans.inv}、${q.ans.size}、${q.ans.real}、${q.ans.side}</span>`;
+                
+                // 建構詳細解答 HTML
+                fbText.innerHTML = `
+                    <div class="flex justify-between border-b border-slate-600 py-1"><span>方向</span> <span class="text-white">${q.ans.inv}</span></div>
+                    <div class="flex justify-between border-b border-slate-600 py-1"><span>大小</span> <span class="text-white">${q.ans.size}</span></div>
+                    <div class="flex justify-between border-b border-slate-600 py-1"><span>虛實</span> <span class="text-white">${q.ans.real}</span></div>
+                    <div class="flex justify-between py-1"><span>位置</span> <span class="text-white">${q.ans.side}</span></div>
+                `;
             }
         }
 
         function nextQuestion() {
             currentQIndex++;
             if (currentQIndex >= shuffledQuestions.length) {
-                // 完成所有題目
-                alert("恭喜完成所有特訓！");
-                initPractice(); // 重新開始
+                alert(`特訓結束！總分：${score}`);
+                initPractice(); 
             } else {
                 loadQuestion();
             }
         }
-
     </script>
 </body>
 </html>
