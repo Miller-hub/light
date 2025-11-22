@@ -62,7 +62,7 @@
     <!-- 頂部導覽 -->
     <header class="w-full max-w-4xl flex flex-col md:flex-row justify-between items-center mb-6 border-b border-slate-700 pb-4 gap-4">
         <h1 class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
-            🧪 尤達數理
+            🧪 尤達數理 | Yodascience
         </h1>
         <nav class="flex gap-2 bg-slate-800 p-1 rounded-xl">
             <button onclick="switchPage('sim')" id="nav-sim" class="px-4 py-2 rounded-lg text-sm font-bold bg-slate-700 hover:bg-slate-600 transition text-green-400 shadow-md">
@@ -104,7 +104,7 @@
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded bg-slate-900 border border-slate-600 hover:border-green-400 transition group">
                     <input type="checkbox" id="showRay2" class="accent-green-400 w-4 h-4" checked onchange="drawSim()">
-                    <span class="text-green-300 text-sm font-medium group-hover:text-green-200">過鏡心不偏折(綠)</span>
+                    <span class="text-green-300 text-sm font-medium group-hover:text-green-200">過鏡心不折射(綠)</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded bg-slate-900 border border-slate-600 hover:border-blue-400 transition group">
                     <input type="checkbox" id="showRay3" class="accent-blue-400 w-4 h-4" checked onchange="drawSim()">
@@ -176,7 +176,7 @@
         <div class="flex justify-between">
             <p class="text-slate-500 text-sm">* 畫線小撇步：從物體頂端開始，畫到鏡片，再畫折射/反射後的方向。</p>
             <button onclick="switchPage('practice')" class="group flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full font-bold transition shadow-lg shadow-green-900/50">
-                去特訓區
+                去考試 (特訓)
                 <span class="group-hover:translate-x-1 transition-transform">→</span>
             </button>
         </div>
@@ -519,6 +519,7 @@
         }
 
         function handleDrawMove(e) {
+            // e.preventDefault(); // 阻止捲動 (已由 CSS touch-action 處理部分，但這比較保險)
             const pos = getDrawPos(e);
 
             if (isMovingObj) {
@@ -535,9 +536,9 @@
                 if (len > 5) { // 只有當畫了一小段後才顯示輔助線，避免抖動
                     drawCtx.save();
                     drawCtx.strokeStyle = penColor;
-                    drawCtx.globalAlpha = 0.2; // 很淡
+                    drawCtx.globalAlpha = 0.5; // Modified from 0.2 to 0.5 for better visibility
                     drawCtx.setLineDash([5, 5]); // 虛線
-                    drawCtx.lineWidth = 1;
+                    drawCtx.lineWidth = 1.5; // Slightly thicker
                     
                     let uDx = dx / len;
                     let uDy = dy / len;
@@ -578,6 +579,12 @@
                 isMovingObj = false;
             } else if (isDrawing) {
                 isDrawing = false;
+                // Save line
+                // 如果是 touch end，changedTouches 會有最後位置，但我們需要追蹤 move 最後的 pos
+                // 簡單起見，我們假設在 move 時已經有最後的 pos，或者利用 event
+                // 這裡為了跨平台簡單，我們需要在 move 時記錄最後位置，或者依賴最後一次 render
+                // 更好的方式：利用 drawMove 裡的邏輯把線存起來
+                // 因為 touchend 沒有 clientX，我們改用變數存 lastPos
             }
             renderDrawBoard();
         }
@@ -619,7 +626,8 @@
             ctx.shadowBlur = 10; ctx.shadowColor = '#22d3ee';
             ctx.beginPath();
             if (type.includes('mirror') && type !== 'plane_mirror') {
-                let curve = (type === 'concave_mirror') ? -20 : 20;
+                // 修正：凹面鏡 (concave) 應該像 )，凸面鏡 (convex) 應該像 (
+                let curve = (type === 'concave_mirror') ? 20 : -20;
                 ctx.moveTo(cx, cy - 100); ctx.quadraticCurveTo(cx + curve, cy, cx, cy + 100);
             } else if (type === 'plane_mirror') {
                 ctx.moveTo(cx, cy - 100); ctx.lineTo(cx, cy + 100);
