@@ -69,21 +69,18 @@
         <!-- Logo 區塊 -->
         <div class="flex items-center">
             <!-- 
-               [使用者圖片區塊]
-               請將圖片 "yoda science business card 去背.jpg" 放在與此 HTML 同一個資料夾中。
-               這裡加了 bg-white 是因為您的 Logo 是黑色的，在深色背景會看不見。
+               [圖片區塊]
+               ★ 重要 ★：請將您的圖片檔改名為 "logo.jpg"，並放在與此 HTML 相同的資料夾中。
+               如果您的圖片是 png，請將下方的 src="logo.jpg" 改為 src="logo.png"。
             -->
             <div class="bg-white p-2 rounded-xl shadow-lg shadow-yellow-500/20 overflow-hidden flex items-center justify-center" style="max-width: 280px;">
-                <img src="yoda science business card 去背.jpg" 
+                <img src="logo.jpg" 
                      alt="YODA SCIENCE Logo" 
                      class="w-full h-auto object-contain"
                      onerror="this.parentElement.style.display='none'; document.getElementById('backup-logo').classList.remove('hidden');" />
             </div>
 
-            <!-- [備用 SVG Logo] 
-                 如果找不到上面的圖片 (onerror)，就會自動顯示這個備用的 SVG 版本，
-                 確保網頁預覽時不會破圖。
-            -->
+            <!-- [備用 SVG Logo] (當找不到 logo.jpg 時會自動顯示這個) -->
             <div id="backup-logo" class="hidden flex items-center gap-4 pl-2">
                 <svg width="60" height="70" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="50" cy="45" r="30" fill="#FDE047" />
