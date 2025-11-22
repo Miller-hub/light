@@ -6,19 +6,14 @@
     <title>尤達數理 | Yodascience</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Righteous&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
         
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: #0f172a; /* Slate 900 */
             color: #e2e8f0;
             overflow-x: hidden;
-            touch-action: pan-y;
-        }
-
-        /* Logo Font */
-        .font-logo {
-            font-family: 'Righteous', cursive; 
+            touch-action: pan-y; /* 允許垂直滾動，但在Canvas上會被JS攔截 */
         }
 
         /* 光劍效果 */
@@ -57,6 +52,7 @@
 
         input[type="checkbox"] { cursor: pointer; }
 
+        /* 畫筆顏色選擇樣式 */
         .color-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
         .color-btn.active { transform: scale(1.2); border-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
     </style>
@@ -64,52 +60,18 @@
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
     <!-- 頂部導覽 -->
-    <header class="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-700 pb-6 gap-6">
-        
-        <!-- Logo 區塊 -->
-        <div class="flex items-center">
-            <!-- 
-               [圖片區塊]
-               ★ 重要 ★：請將您的圖片檔改名為 "logo.jpg"，並放在與此 HTML 相同的資料夾中。
-               如果您的圖片是 png，請將下方的 src="logo.jpg" 改為 src="logo.png"。
-            -->
-            <div class="bg-white p-2 rounded-xl shadow-lg shadow-yellow-500/20 overflow-hidden flex items-center justify-center" style="max-width: 280px;">
-                <img src="logo.jpg" 
-                     alt="YODA SCIENCE Logo" 
-                     class="w-full h-auto object-contain"
-                     onerror="this.parentElement.style.display='none'; document.getElementById('backup-logo').classList.remove('hidden');" />
-            </div>
-
-            <!-- [備用 SVG Logo] (當找不到 logo.jpg 時會自動顯示這個) -->
-            <div id="backup-logo" class="hidden flex items-center gap-4 pl-2">
-                <svg width="60" height="70" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="45" r="30" fill="#FDE047" />
-                    <path d="M20 45 C20 28.4315 33.4315 15 50 15 C66.5685 15 80 28.4315 80 45 C80 58.5 72 70 62 76 L 62 85 L 38 85 L 38 76 C 28 70 20 58.5 20 45 Z" stroke="black" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-                    <rect x="38" y="88" width="24" height="8" fill="black" />
-                    <rect x="42" y="100" width="16" height="6" fill="black" />
-                    <path d="M35 45 L 35 55 L 42 55 L 42 45" stroke="black" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M65 45 L 65 55 L 58 55 L 58 45" stroke="black" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M42 45 L 46 50 L 50 40 L 54 50 L 58 45" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                    <circle cx="35" cy="45" r="3" fill="black"/>
-                    <circle cx="65" cy="45" r="3" fill="black"/>
-                </svg>
-                <div class="flex flex-col">
-                    <h1 class="text-3xl md:text-4xl font-bold text-white tracking-wider font-logo">
-                        YODA SCIENCE
-                    </h1>
-                    <span class="text-slate-400 text-sm italic tracking-wide font-serif">Experiments on Learning</span>
-                </div>
-            </div>
-        </div>
-
-        <nav class="flex gap-2 bg-slate-800 p-1.5 rounded-xl">
-            <button onclick="switchPage('sim')" id="nav-sim" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-slate-700 hover:bg-slate-600 transition text-green-400 shadow-md">
+    <header class="w-full max-w-4xl flex flex-col md:flex-row justify-between items-center mb-6 border-b border-slate-700 pb-4 gap-4">
+        <h1 class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
+            🧪 尤達數理 | Yodascience
+        </h1>
+        <nav class="flex gap-2 bg-slate-800 p-1 rounded-xl">
+            <button onclick="switchPage('sim')" id="nav-sim" class="px-4 py-2 rounded-lg text-sm font-bold bg-slate-700 hover:bg-slate-600 transition text-green-400 shadow-md">
                 實驗室
             </button>
-            <button onclick="switchPage('draw')" id="nav-draw" class="px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-700 transition text-slate-400">
+            <button onclick="switchPage('draw')" id="nav-draw" class="px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-700 transition text-slate-400">
                 繪圖板
             </button>
-            <button onclick="switchPage('practice')" id="nav-practice" class="px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-700 transition text-slate-400">
+            <button onclick="switchPage('practice')" id="nav-practice" class="px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-700 transition text-slate-400">
                 特訓場
             </button>
         </nav>
