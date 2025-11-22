@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>尤達數理 | Yoda's Optical Lab</title>
+    <title>尤達數理 | Yodascience</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -100,15 +100,15 @@
                 <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">光路：</span>
                 <label class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded bg-slate-900 border border-slate-600 hover:border-red-400 transition group">
                     <input type="checkbox" id="showRay1" class="accent-red-400 w-4 h-4" checked onchange="drawSim()">
-                    <span class="text-red-300 text-sm font-medium group-hover:text-red-200">平行光(紅)</span>
+                    <span class="text-red-300 text-sm font-medium group-hover:text-red-200">平行主軸過焦點(紅)</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded bg-slate-900 border border-slate-600 hover:border-green-400 transition group">
                     <input type="checkbox" id="showRay2" class="accent-green-400 w-4 h-4" checked onchange="drawSim()">
-                    <span class="text-green-300 text-sm font-medium group-hover:text-green-200">過鏡心(綠)</span>
+                    <span class="text-green-300 text-sm font-medium group-hover:text-green-200">過鏡心不偏折(綠)</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded bg-slate-900 border border-slate-600 hover:border-blue-400 transition group">
                     <input type="checkbox" id="showRay3" class="accent-blue-400 w-4 h-4" checked onchange="drawSim()">
-                    <span class="text-blue-300 text-sm font-medium group-hover:text-blue-200">過焦點(藍)</span>
+                    <span class="text-blue-300 text-sm font-medium group-hover:text-blue-200">過焦點平行主軸(藍)</span>
                 </label>
             </div>
         </div>
@@ -148,9 +148,9 @@
             <!-- 畫筆工具 -->
             <div class="flex items-center gap-4 bg-slate-900 px-4 py-2 rounded-lg border border-slate-600">
                 <span class="text-xs text-slate-400 font-bold uppercase mr-1">畫筆：</span>
-                <button class="color-btn bg-red-400 active" onclick="setPenColor('#F87171', this)" title="平行主軸過焦點 (紅)"></button>
-                <button class="color-btn bg-green-400" onclick="setPenColor('#4ADE80', this)" title="過鏡心不偏折 (綠)"></button>
-                <button class="color-btn bg-blue-400" onclick="setPenColor('#60A5FA', this)" title="過焦點平行主軸 (藍)"></button>
+                <button class="color-btn bg-red-400 active" onclick="setPenColor('#F87171', this)" title="紅光 (平行光)"></button>
+                <button class="color-btn bg-green-400" onclick="setPenColor('#4ADE80', this)" title="綠光 (過鏡心)"></button>
+                <button class="color-btn bg-blue-400" onclick="setPenColor('#60A5FA', this)" title="藍光 (過焦點)"></button>
                 <div class="w-px h-6 bg-slate-700 mx-2"></div>
                 <button onclick="undoDraw()" class="text-slate-400 hover:text-white text-sm font-bold flex items-center gap-1">↩ 復原</button>
                 <button onclick="clearDrawLines()" class="text-slate-400 hover:text-red-400 text-sm font-bold flex items-center gap-1">🗑️ 清除</button>
@@ -169,14 +169,14 @@
             <!-- 操作指引 -->
             <div class="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-700 pointer-events-none">
                 <p class="text-slate-300 text-sm">🖱️ <span class="text-white font-bold">按住滑鼠</span> 在畫布上畫出直線</p>
-                <p class="text-slate-400 text-xs mt-1">💡 拖曳 <span class="text-red-500 font-bold">紅色箭頭</span> 可改變題目物距</p>
+                <p class="text-slate-400 text-xs mt-1">💡 拖曳 <span class="text-red-500 font-bold">物體底部(文字)</span> 可移動物體</p>
             </div>
         </div>
 
         <div class="flex justify-between">
             <p class="text-slate-500 text-sm">* 畫線小撇步：從物體頂端開始，畫到鏡片，再畫折射/反射後的方向。</p>
             <button onclick="switchPage('practice')" class="group flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full font-bold transition shadow-lg shadow-green-900/50">
-                去特訓場
+                去特訓區
                 <span class="group-hover:translate-x-1 transition-transform">→</span>
             </button>
         </div>
@@ -503,11 +503,12 @@
         function handleDrawStart(e) {
             const pos = getDrawPos(e);
             
-            // Check if clicking on object head (Move Mode)
-            let objHeadX = drawCX + drawObjX;
-            let objHeadY = drawCY - commonH;
-            // 判定範圍寬一點
-            if (Math.abs(pos.x - objHeadX) < 30 && Math.abs(pos.y - objHeadY) < 50) {
+            // 改為判定物體「底部」（文字處）才觸發移動，避免與頂端畫線衝突
+            let objBaseX = drawCX + drawObjX;
+            let objBaseY = drawCY; 
+            
+            // 底部感應區：X±20, Y在軸線附近及下方 (例如 -30 ~ +30)
+            if (Math.abs(pos.x - objBaseX) < 20 && Math.abs(pos.y - objBaseY) < 30) {
                 isMovingObj = true;
                 drawCanvas.style.cursor = 'move';
             } else {
@@ -518,7 +519,6 @@
         }
 
         function handleDrawMove(e) {
-            // e.preventDefault(); // 阻止捲動 (已由 CSS touch-action 處理部分，但這比較保險)
             const pos = getDrawPos(e);
 
             if (isMovingObj) {
@@ -526,6 +526,35 @@
                 renderDrawBoard();
             } else if (isDrawing) {
                 renderDrawBoard(); // 清除舊的預覽
+                
+                // === 新增：繪製輔助延長線 ===
+                let dx = pos.x - startPoint.x;
+                let dy = pos.y - startPoint.y;
+                let len = Math.sqrt(dx*dx + dy*dy);
+
+                if (len > 5) { // 只有當畫了一小段後才顯示輔助線，避免抖動
+                    drawCtx.save();
+                    drawCtx.strokeStyle = penColor;
+                    drawCtx.globalAlpha = 0.2; // 很淡
+                    drawCtx.setLineDash([5, 5]); // 虛線
+                    drawCtx.lineWidth = 1;
+                    
+                    let uDx = dx / len;
+                    let uDy = dy / len;
+                    
+                    // 延伸到畫布外
+                    const EXT_LEN = 2000;
+                    
+                    drawCtx.beginPath();
+                    // 從起點往後延伸
+                    drawCtx.moveTo(startPoint.x - uDx * EXT_LEN, startPoint.y - uDy * EXT_LEN);
+                    // 往終點延伸
+                    drawCtx.lineTo(startPoint.x + uDx * EXT_LEN, startPoint.y + uDy * EXT_LEN);
+                    drawCtx.stroke();
+                    drawCtx.restore();
+                }
+                // ==========================
+                
                 // 畫預覽線
                 drawCtx.strokeStyle = penColor;
                 drawCtx.lineWidth = 3;
@@ -534,9 +563,9 @@
                 drawCtx.lineTo(pos.x, pos.y);
                 drawCtx.stroke();
             } else {
-                // Hover effect logic (cursor)
-                let objHeadX = drawCX + drawObjX;
-                if (Math.abs(pos.x - objHeadX) < 30 && Math.abs(pos.y - (drawCY - commonH)) < 50) {
+                // Hover effect logic (cursor) - 僅底部觸發 Move cursor
+                let objBaseX = drawCX + drawObjX;
+                if (Math.abs(pos.x - objBaseX) < 20 && Math.abs(pos.y - drawCY) < 30) {
                     drawCanvas.style.cursor = 'move';
                 } else {
                     drawCanvas.style.cursor = 'crosshair';
@@ -549,12 +578,6 @@
                 isMovingObj = false;
             } else if (isDrawing) {
                 isDrawing = false;
-                // Save line
-                // 如果是 touch end，changedTouches 會有最後位置，但我們需要追蹤 move 最後的 pos
-                // 簡單起見，我們假設在 move 時已經有最後的 pos，或者利用 event
-                // 這裡為了跨平台簡單，我們需要在 move 時記錄最後位置，或者依賴最後一次 render
-                // 更好的方式：利用 drawMove 裡的邏輯把線存起來
-                // 因為 touchend 沒有 clientX，我們改用變數存 lastPos
             }
             renderDrawBoard();
         }
@@ -774,6 +797,14 @@
             if (currentQIndex >= shuffledQuestions.length) { alert(`特訓結束！總分：${score}`); initPractice(); }
             else loadQuestion();
         }
+
+        // ==========================================
+        // 6. 初始化 (Initialization)
+        // ==========================================
+        // 確保網頁載入後立即執行一次初始化
+        window.addEventListener('load', () => {
+            switchPage('sim');
+        });
     </script>
 </body>
 </html>
